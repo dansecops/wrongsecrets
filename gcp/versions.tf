@@ -15,15 +15,16 @@ terraform {
     kubernetes = ">= 1.11"
     shell = {
       source  = "scottwinkler/shell"
-      version = "1.7.7"
+      version = "1.7.10"
     }
   }
 
   # For shared state:
   # Set the resource group in the backend configuration below, then uncomment and apply!
   # Note that you probably already create a resource group. Don't forget to set that correctly in this file.
-  #  backend "gcs" {
-  #    bucket  = ""
-  #    prefix  = "terraform/state"
-  #  }
+  
+  backend "gcs" {
+    bucket = var.project_id
+    prefix = "terraform/state"
+  }
 }

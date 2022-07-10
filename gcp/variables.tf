@@ -20,3 +20,8 @@ variable "cluster_name" {
   type        = string
   default     = "wrongsecrets-exercise-cluster"
 }
+
+variable "bucket" {
+  description = "backend bucket"
+  type        = string
+}
