@@ -45,6 +45,8 @@ Heroku_publish_demo() {
     cd ../..
     heroku container:push --recursive --arg argBasedVersion=${tag}heroku --app arcane-scrubland-42646
     heroku container:release web --app arcane-scrubland-42646
+    heroku container:push --recursive --arg argBasedVersion=${tag}heroku,CTF_ENABLED=true,HINTS_ENABLED=false --app wrongsecrets-ctf
+    heroku container:release web --app wrongsecrets-ctf
     exit
 }
 
@@ -54,7 +56,7 @@ Heroku_publish_prod(){
     heroku container:login
     echo "heroku deployment to prod"
     cd ../..
-    heroku container:push --recursive --arg argBasedVersion=${tag}heroku --arg CANARY_URLS=http://canarytokens.com/feedback/images/traffic/tgy3epux7jm59n0ejb4xv4zg3/submit.aspx,http://canarytokens.com/traffic/cjldn0fsgkz97ufsr92qelimv/post.jsp --app=wrongsecrets
+    heroku container:push --recursive --arg argBasedVersion=${tag}heroku,CANARY_URLS=http://canarytokens.com/feedback/images/traffic/tgy3epux7jm59n0ejb4xv4zg3/submit.aspx,http://canarytokens.com/traffic/cjldn0fsgkz97ufsr92qelimv/post.jsp --app=wrongsecrets
     heroku container:release web --app=wrongsecrets
     exit
 }
@@ -254,6 +256,7 @@ create_containers() {
         docker buildx build --platform linux/amd64,linux/arm64 -t jeroenwillemsen/wrongsecrets:$tag-no-vault --build-arg "$buildarg" --build-arg "PORT=8081" --build-arg "argBasedVersion=$tag" --build-arg "spring_profile=without-vault" --push ./../../.
         docker buildx build --platform linux/amd64,linux/arm64 -t jeroenwillemsen/wrongsecrets:$tag-local-vault --build-arg "$buildarg" --build-arg "PORT=8081" --build-arg "argBasedVersion=$tag" --build-arg "spring_profile=local-vault" --push ./../../.
         docker buildx build --platform linux/amd64,linux/arm64 -t jeroenwillemsen/wrongsecrets:$tag-k8s-vault --build-arg "$buildarg" --build-arg "PORT=8081" --build-arg "argBasedVersion=$tag" --build-arg "spring_profile=kubernetes-vault" --push ./../../.
+        docker buildx build --platform linux/amd64,linux/arm64 -t jeroenwillemsen/wrongsecrets-desktop:$tag -f Dockerfile.webdesktop --push .
     elif [[ "$script_mode" == "test" ]]; then
         docker buildx build -t jeroenwillemsen/wrongsecrets:$tag --build-arg "$buildarg" --build-arg "PORT=8081" --build-arg "argBasedVersion=$tag" --build-arg "spring_profile=without-vault" --load ./../../.
     else

@@ -27,7 +27,7 @@ For the basic docker exercises you currently require:
 You can install it by doing:
 
 ```bash
-docker run -p 8080:8080 jeroenwillemsen/wrongsecrets:1.4.7-no-vault
+docker run -p 8080:8080 jeroenwillemsen/wrongsecrets:1.5.1-no-vault
 ```
 
 Now you can try to find the secrets by means of solving the challenge offered at:
@@ -186,6 +186,7 @@ Top contributors:
 - [Ruben Kruiver @RubenAtBinx](https://github.com/RubenAtBinx)
 - [Finn @f3rn0s](https://github.com/f3rn0s)
 - [Alex Bender @alex-bender](https://github.com/alex-bender)
+- [Rick M @kingthorin](https://github.com/kingthorin)
 
 Testers:
 
@@ -212,6 +213,33 @@ You can help us by the following methods:
 As tons of secret detection tools are coming up for both Docker and Git, we are creating a Benchmark testbed for it.
 Want to know if your tool detects everything? We will keep track of the embedded secrets in [this issue](https://github.com/commjoen/wrongsecrets/issues/201) and have a [branch](https://github.com/commjoen/wrongsecrets/tree/experiment-bed) in which we put additional secrets for your tool to detect.
 The branch will contain a Docker container generation script using which you can eventually test your container secret scanning.
+
+## CTF
+
+### CTFD Support
+
+NOTE: CTFD support is experimental, and now works based on the [Juiceshop CTF CLI](https://github.com/juice-shop/juice-shop-ctf). 
+NOTE-II:  https://wrongsecrets-ctf.herokuapp.com is based on a free heroku instance, which takes time to warm up. Initial creation of the zip file for CTFD requires you to visit [https://wrongsecrets-ctf.herokuapp.com/api/Challenges](https://wrongsecrets-ctf.herokuapp.com/api/Challenges) once before executing the steps below.
+
+Follow the following steps:
+
+```shell
+    npm install -g juice-shop-ctf-cli  
+    juice-shop-ctf #choose ctfd and https://wrongsecrets-ctf.herokuapp.com as domain. No trailing slash! The key is 'TRwzkRJnHOTckssAeyJbysWgP!Qc2T', feel free to enable hints. We do not support snippets or links/urls to code or hints.
+    docker run -p 8001:8000 -it ctfd/ctfd:3.4.3 
+```
+
+Now visit the CTFD instance at [http://localhost:8001](http://localhost:8001) and setup your CTF. Then use the administrative backup function to import the zipfile you created with the juice-shop-ctf command.
+Game on using [https://wrongsecrets-ctf.herokuapp.com](https://wrongsecrets-ctf.herokuapp.com) !
+Want to setup your own? You can! Watch out for people finding your key though, so secure it properly: make sure the running container with the actual ctf-key is not exposed to the audience, similar to our heroku container.
+
+## FBCTF Support (Experimental!)
+
+NOTE: FBCTF support is experimental.
+
+follow the same step as with CTFD, only now choose fbctfd and as a url for the countrymapping choose `https://raw.githubusercontent.com/commjoen/wrongsecrets/79a982558016c8ce70948a8106f9a2ee5b5b9eea/config/fbctf.yml`. Then follow [https://github.com/facebookarchive/fbctf/wiki/Quick-Setup-Guide](https://github.com/facebookarchive/fbctf/wiki/Quick-Setup-Guide) to run the FBCTF.
+
+
 
 ## Notes on development
 
@@ -282,6 +310,28 @@ If you have made some changes to the codebase or added a new challenge and would
 3. Run the docker-create script `bash docker-create.sh`.
 4. Follow any instructions given, you made need to install/change packages.
 5. Run the newly created container `docker run -p 8080:8080 jeroenwillemsen/wrongsecrets:local-test`
+
+## Want to play, but are not allowed to install the tools?
+
+If you want to play the challenges, but cannot install tools like keepass, Radare, etc. But are allowed to run Docker containers, try the following:
+
+```shell
+docker run -d \                                         
+  --name=webtop \     
+  --security-opt seccomp=unconfined `#optional` \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Europe/London \
+  -e SUBFOLDER=/ `#optional` \
+  -e KEYBOARD=en-us-qwerty `#optional` \
+  -p 3000:3000 \
+  -v /var/run/docker.sock:/var/run/docker.sock `#optional` \
+  --shm-size="1gb" `#optional` \
+  --restart unless-stopped \
+  jeroenwillemsen/wrongsecrets-desktop:<VERSION HERE>
+```
+
+Note: be careful with trying to deploy the `jeroenwillemsen/wrongsecrets-desktop` container to Heroku ;-).
 
 ## Further reading on secrets management
 
